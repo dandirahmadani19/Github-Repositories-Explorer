@@ -1,12 +1,14 @@
 export type AccordionUsersProps = {
-  dataUsers: {
+  data?: ResponseGithubUsers;
+  isLoading: boolean;
+  search: string;
+};
+
+export type ResponseGithubUsers = {
+  incomplete_results: boolean;
+  total_count: number;
+  items: {
     id: string;
-    name: string;
-    repositories: {
-      id: string;
-      title: string;
-      description: string;
-      star: number;
-    }[];
+    login: string;
   }[];
 };
