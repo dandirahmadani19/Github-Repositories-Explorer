@@ -4,7 +4,6 @@ import { AllQueriesKeys } from "@/data-services";
 
 export type UseInfiniteApiRequestProps<T> = {
   key: AllQueriesKeys;
-  apiType?: "github-token";
   config?: {
     params?: { [key: string]: string };
     query?: { [key: string]: unknown };
