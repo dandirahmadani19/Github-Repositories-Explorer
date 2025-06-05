@@ -4,7 +4,6 @@ import { QueryKey, UseQueryOptions } from "@tanstack/react-query";
 
 export type UseQueryApiRequestProps<T> = {
   key: AllQueriesKeys;
-  apiType?: "github-token" | "github-without-token";
   config?: {
     params?: { [key: string]: string };
     query?: { [key: string]: unknown };

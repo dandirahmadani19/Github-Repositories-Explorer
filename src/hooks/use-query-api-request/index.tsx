@@ -3,23 +3,17 @@ import { QueryKey, UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { allQueries } from "@/data-services";
 import { constructUrl } from "@/lib/utils/contruct-url";
 import { AxiosErrorResponse } from "@/types/global";
-import useAxiosGithubToken from "../use-axios-github-token";
+import useAxiosCustom from "../use-axios-custom";
 import { UseQueryApiRequestProps } from "./types";
 
 function useQueryApiRequest<T = unknown>({
   key,
   options,
   config,
-  apiType = "github-token",
 }: UseQueryApiRequestProps<T>) {
   const url = allQueries[key];
   const replacedUrl = constructUrl(url, config);
-
-  const axiosCustom = {
-    "github-token": useAxiosGithubToken(),
-    "github-without-token": useAxiosGithubToken(),
-  };
-  const axiosFetch = axiosCustom[apiType];
+  const axiosFetch = useAxiosCustom();
 
   const fetchData = async () => {
     const response = await axiosFetch({
