@@ -6,6 +6,7 @@ import SkeletonRepositoriesUser from "./components/skeleton-repositories-user";
 import { ReponseGithubRepos, RepositoriesUserProps } from "./types";
 
 const RepositoriesUser = (props: RepositoriesUserProps) => {
+  const showReposPerPage = 5;
   const { username } = props;
   const [page, setPage] = useState<number>(1);
   const [repos, setRepos] = useState<ReponseGithubRepos[]>([]);
@@ -19,7 +20,7 @@ const RepositoriesUser = (props: RepositoriesUserProps) => {
         username,
       },
       query: {
-        per_page: 5,
+        per_page: showReposPerPage,
         page,
       },
     },
@@ -32,7 +33,7 @@ const RepositoriesUser = (props: RepositoriesUserProps) => {
     if (data) {
       setRepos((prev) => (page === 1 ? data : [...prev, ...data]));
       setIsLoadingShowMore(false);
-      if (data.length == 0) {
+      if (data.length < showReposPerPage) {
         setIsEndOfData(true);
       }
     }
