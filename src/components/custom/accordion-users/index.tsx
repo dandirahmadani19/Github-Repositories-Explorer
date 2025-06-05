@@ -4,12 +4,37 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import useInfiniteApiQueryRequest from "@/hooks/use-infinite-query-api-request";
+import { Loader2Icon } from "lucide-react";
 import RepositoriesUser from "../repositories-user";
 import SkeletonAccordionUsers from "./components/skeleton-accordion-users";
-import { AccordionUsersProps } from "./types";
+import { AccordionUsersProps, ResponseGithubUsers } from "./types";
 
 const AccordionUsers = (props: AccordionUsersProps) => {
-  const { data, isLoading, search } = props;
+  const { search } = props;
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteApiQueryRequest<ResponseGithubUsers>({
+      key: "github-user-search",
+      config: {
+        query: {
+          q: search,
+          per_page: 15,
+        },
+      },
+      options: {
+        enabled: Boolean(search),
+        getNextPageParam: (lastPage, allPages) => {
+          const fetchedCount = allPages.reduce(
+            (sum, page) => sum + (page.items?.length ?? 0),
+            0
+          );
+          return fetchedCount < lastPage.total_count
+            ? allPages.length + 1
+            : undefined;
+        },
+      },
+    });
 
   if (isLoading || !data) {
     return <SkeletonAccordionUsers />;
@@ -17,21 +42,45 @@ const AccordionUsers = (props: AccordionUsersProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs md:text-[11pt]">{data.total_count > 0 ? 'Showing users' : 'No users shown'} for "{search}"</p>
+      <p className="text-xs md:text-[11pt]">
+        {data.pages[0].total_count > 0 ? "Showing users" : "No users shown"} for
+        "{search}"
+      </p>
+
       <Accordion
         type="single"
         collapsible
         className="w-full flex flex-col gap-3"
       >
-        {data.items.map((user) => (
-          <AccordionItem key={user.id} value={`value-${user.id}`}>
-            <AccordionTrigger>{user.login}</AccordionTrigger>
-            <AccordionContent>
-              <RepositoriesUser username={user.login} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+        {data.pages.flatMap((page) =>
+          page.items.map((user) => (
+            <AccordionItem key={user.id} value={`value-${user.id}`}>
+              <AccordionTrigger>{user.login}</AccordionTrigger>
+              <AccordionContent>
+                <RepositoriesUser username={user.login} />
+              </AccordionContent>
+            </AccordionItem>
+          ))
+        )}
       </Accordion>
+
+      {hasNextPage && (
+        <div className="self-center">
+          {isFetchingNextPage ? (
+            <span className="flex gap-1 items-center">
+              <Loader2Icon className="animate-spin" size={16} /> Load more
+              users...
+            </span>
+          ) : (
+            <p
+              className="cursor-pointer underline text-blue-500 hover:text-blue-600"
+              onClick={() => fetchNextPage()}
+            >
+              Load more users
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

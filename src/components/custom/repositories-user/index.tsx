@@ -68,15 +68,15 @@ const RepositoriesUser = (props: RepositoriesUserProps) => {
             <div className="self-end">
               {isLoadingShowMore ? (
                 <span className="flex gap-1 items-center">
-                  <Loader2Icon className="animate-spin" size={16} /> Fetching
-                  more repositories...
+                  <Loader2Icon className="animate-spin" size={16} /> Load more
+                  repositories...
                 </span>
               ) : (
                 <p
                   className="cursor-pointer underline text-blue-500 hover:text-blue-600"
                   onClick={handleClickShowMore}
                 >
-                  Show more {">>"}
+                  Show more repositories {">>"}
                 </p>
               )}
             </div>

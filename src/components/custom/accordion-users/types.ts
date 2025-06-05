@@ -1,6 +1,5 @@
 export type AccordionUsersProps = {
-  data?: ResponseGithubUsers;
-  isLoading: boolean;
+
   search: string;
 };
 

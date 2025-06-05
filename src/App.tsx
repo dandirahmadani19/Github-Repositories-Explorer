@@ -1,10 +1,8 @@
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import AccordionUsers from "./components/custom/accordion-users";
-import { ResponseGithubUsers } from "./components/custom/accordion-users/types";
 import { ButtonLoading } from "./components/ui/button-loading";
 import { Input } from "./components/ui/input";
-import useQueryApiRequest from "./hooks/use-query-api-request";
 import { getQueryParam, setQueryParam } from "./lib/utils/url-query-param";
 
 const App = () => {
@@ -15,20 +13,6 @@ const App = () => {
     },
   });
   const [search, setSearch] = useState<string>(defaultSearch || "");
-
-  const { data, isLoading } = useQueryApiRequest<ResponseGithubUsers>({
-    key: "github-user-search",
-    config: {
-      query: {
-        q: search,
-        page: 1,
-        per_page: 10,
-      },
-    },
-    options: {
-      enabled: Boolean(search),
-    },
-  });
 
   const onClickButtonSearch = useCallback(() => {
     const searchText = getValues("search");
@@ -47,13 +31,11 @@ const App = () => {
         <ButtonLoading
           variant={"blue"}
           onClick={onClickButtonSearch}
-          isLoading={isLoading}
+          isLoading={false}
         >
           Search
         </ButtonLoading>
-        {Boolean(search) && (
-          <AccordionUsers data={data} isLoading={isLoading} search={search} />
-        )}
+        {Boolean(search) && <AccordionUsers search={search} />}
       </div>
     </div>
   );
