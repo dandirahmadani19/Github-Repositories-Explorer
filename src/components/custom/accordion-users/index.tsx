@@ -9,9 +9,11 @@ import { Loader2Icon } from "lucide-react";
 import RepositoriesUser from "../repositories-user";
 import SkeletonAccordionUsers from "./components/skeleton-accordion-users";
 import { AccordionUsersProps, ResponseGithubUsers } from "./types";
+import { useEffect, useState } from "react";
 
 const AccordionUsers = (props: AccordionUsersProps) => {
   const { search } = props;
+  const [openAccordion, setOpenAccordion] = useState<string | undefined>();
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteApiQueryRequest<ResponseGithubUsers>({
@@ -36,6 +38,22 @@ const AccordionUsers = (props: AccordionUsersProps) => {
       },
     });
 
+  useEffect(() => {
+    if (openAccordion && !isLoading) {
+      const timeout = setTimeout(() => {
+        const el = document.getElementById(openAccordion);
+        if (el) {
+          el.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, 300);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [openAccordion, isLoading]);
+
   if (isLoading || !data) {
     return <SkeletonAccordionUsers />;
   }
@@ -50,11 +68,17 @@ const AccordionUsers = (props: AccordionUsersProps) => {
       <Accordion
         type="single"
         collapsible
+        value={openAccordion}
+        onValueChange={setOpenAccordion}
         className="w-full flex flex-col gap-3"
       >
         {data.pages.flatMap((page) =>
           page.items.map((user) => (
-            <AccordionItem key={user.id} value={`value-${user.id}`}>
+            <AccordionItem
+              key={user.id}
+              value={`value-${user.id}`}
+              id={`value-${user.id}`}
+            >
               <AccordionTrigger>{user.login}</AccordionTrigger>
               <AccordionContent>
                 <RepositoriesUser username={user.login} />
